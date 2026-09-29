@@ -24,15 +24,29 @@ data = {
         "Aditya"
     ],
 
-    "Python": [85, 78, 65, 90, 88, 72, 95, 70],
+    "Python": [
+        85, 78, 65, 90,
+        88, 72, 95, 70
+    ],
 
-    "NumPy": [80, 82, 60, 85, 90, 68, 92, 75],
+    "NumPy": [
+        80, 82, 60, 85,
+        90, 68, 92, 75
+    ],
 
-    "Pandas": [88, 75, 70, 92, 85, 74, 96, 78],
+    "Pandas": [
+        88, 75, 70, 92,
+        85, 74, 96, 78
+    ],
 
-    "Mathematics": [75, 80, 62, 88, 91, 70, 89, 73]
+    "Mathematics": [
+        75, 80, 62, 88,
+        91, 70, 89, 73
+    ]
 }
 
+
+# Create DataFrame
 df = pd.DataFrame(data)
 
 subjects = [
@@ -44,7 +58,7 @@ subjects = [
 
 
 # ============================================================
-# BASIC PERFORMANCE CALCULATIONS
+# CALCULATIONS
 # ============================================================
 
 df["Total"] = df[subjects].sum(axis=1)
@@ -59,6 +73,7 @@ df["Result"] = np.where(
     "Pass",
     "Fail"
 )
+
 
 class_average = round(
     df["Average"].mean(),
@@ -77,96 +92,65 @@ pass_rate = round(
 
 
 # ============================================================
-# CSS
+# STUDENT PERFORMANCE CHART
 # ============================================================
 
-css = """
-.title {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.kpi {
-    text-align: center;
-    padding: 15px;
-    border-radius: 12px;
-    background: #f5f5f5;
-}
-
-footer {
-    display: none !important;
-}
-"""
-
-
-# ============================================================
-# STUDENT ANALYSIS
-# ============================================================
-
-def student_analysis(student):
-
-    row = df[df["Name"] == student].iloc[0]
-
-    values = row[subjects].values
-
-    best_subject = subjects[
-        np.argmax(values)
-    ]
+def student_performance():
 
     fig, ax = plt.subplots(
-        figsize=(8, 5)
+        figsize=(9, 5)
     )
 
-    ax.bar(
-        subjects,
-        values
-    )
+    x = np.arange(len(df))
+
+    width = 0.2
+
+    for i, subject in enumerate(subjects):
+
+        ax.bar(
+            x + i * width,
+            df[subject],
+            width,
+            label=subject
+        )
 
     ax.set_title(
-        f"{student} - Subject Performance"
+        "Student Performance by Subject"
     )
 
     ax.set_xlabel(
-        "Subjects"
+        "Students"
     )
 
     ax.set_ylabel(
         "Marks"
     )
 
-    ax.set_ylim(
-        0,
-        100
+    ax.set_xticks(
+        x + width * 1.5
     )
 
-    plt.xticks(
-        rotation=20
+    ax.set_xticklabels(
+        df["Name"]
+    )
+
+    ax.legend()
+
+    ax.grid(
+        axis="y",
+        alpha=0.3
     )
 
     plt.tight_layout()
 
-    information = f"""
-## 👨‍🎓 Student Information
-
-**Student:** {student}
-
-**Total Marks:** {row["Total"]}
-
-**Average:** {row["Average"]}
-
-**Result:** {row["Result"]}
-
-**Best Subject:** {best_subject}
-"""
-
-    return information, fig
+    return fig
 
 
 # ============================================================
-# SUBJECT ANALYSIS
+# SUBJECT AVERAGE CHART
 # ============================================================
 
-def subject_analysis():
+def subject_average():
 
     averages = df[subjects].mean()
 
@@ -175,8 +159,8 @@ def subject_analysis():
     )
 
     ax.bar(
-        subjects,
-        averages
+        averages.index,
+        averages.values
     )
 
     ax.set_title(
@@ -191,13 +175,9 @@ def subject_analysis():
         "Average Marks"
     )
 
-    ax.set_ylim(
-        0,
-        100
-    )
-
-    plt.xticks(
-        rotation=20
+    ax.grid(
+        axis="y",
+        alpha=0.3
     )
 
     plt.tight_layout()
@@ -209,7 +189,7 @@ def subject_analysis():
 # STUDENT AVERAGE CHART
 # ============================================================
 
-def student_average_chart():
+def student_average():
 
     fig, ax = plt.subplots(
         figsize=(8, 5)
@@ -232,13 +212,14 @@ def student_average_chart():
         "Average Marks"
     )
 
-    ax.set_ylim(
-        0,
-        100
+    ax.tick_params(
+        axis="x",
+        rotation=30
     )
 
-    plt.xticks(
-        rotation=30
+    ax.grid(
+        axis="y",
+        alpha=0.3
     )
 
     plt.tight_layout()
@@ -247,7 +228,7 @@ def student_average_chart():
 
 
 # ============================================================
-# HEATMAP
+# PERFORMANCE HEATMAP
 # ============================================================
 
 def performance_heatmap():
@@ -279,7 +260,7 @@ def performance_heatmap():
         df["Name"]
     )
 
-    # Display marks inside the heatmap
+    # Display marks inside cells
     for i in range(len(df)):
 
         for j in range(len(subjects)):
@@ -310,18 +291,20 @@ def performance_heatmap():
 
 
 # ============================================================
-# PCA
+# PCA VISUALIZATION
 # ============================================================
 
 def pca_visualization():
 
-    # Select performance features
+    # Select subject columns
     X = df[subjects]
 
-    # Standardize the data
+    # Standardize data
     scaler = StandardScaler()
 
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(
+        X
+    )
 
     # Apply PCA
     pca = PCA(
@@ -332,7 +315,7 @@ def pca_visualization():
         X_scaled
     )
 
-    # Create dataframe
+    # Create DataFrame
     pca_df = pd.DataFrame(
         X_pca,
         columns=[
@@ -343,7 +326,7 @@ def pca_visualization():
 
     pca_df["Name"] = df["Name"]
 
-    # Create plot
+    # Create graph
     fig, ax = plt.subplots(
         figsize=(8, 5)
     )
@@ -366,7 +349,8 @@ def pca_visualization():
                 pca_df["PC2"].iloc[i]
             ),
             xytext=(5, 5),
-            textcoords="offset points"
+            textcoords="offset points",
+            fontsize=9
         )
 
     ax.set_title(
@@ -388,62 +372,24 @@ def pca_visualization():
 
     plt.tight_layout()
 
-    # Explained variance
-    variance_1 = (
-        pca.explained_variance_ratio_[0]
-        * 100
-    )
-
-    variance_2 = (
-        pca.explained_variance_ratio_[1]
-        * 100
-    )
-
-    total_variance = (
-        variance_1 + variance_2
-    )
-
-    information = f"""
-## 🔵 PCA Analysis
-
-**Original Dimensions:** {len(subjects)}
-
-**Reduced Dimensions:** 2
-
-**Principal Component 1:** {variance_1:.2f}%
-
-**Principal Component 2:** {variance_2:.2f}%
-
-**Total Variance Represented:** {total_variance:.2f}%
-
-### What does PCA do?
-
-PCA transforms the original student
-performance features into new variables
-called Principal Components.
-
-The first two components are used to
-create a 2D visualization while retaining
-as much variation in the original data
-as possible.
-"""
-
-    return information, fig
+    return fig
 
 
 # ============================================================
-# t-SNE
+# t-SNE VISUALIZATION
 # ============================================================
 
 def tsne_visualization():
 
-    # Select performance features
+    # Select subject columns
     X = df[subjects]
 
     # Standardize data
     scaler = StandardScaler()
 
-    X_scaled = scaler.fit_transform(X)
+    X_scaled = scaler.fit_transform(
+        X
+    )
 
     # Apply t-SNE
     tsne = TSNE(
@@ -456,7 +402,7 @@ def tsne_visualization():
         X_scaled
     )
 
-    # Create dataframe
+    # Create DataFrame
     tsne_df = pd.DataFrame(
         X_tsne,
         columns=[
@@ -467,7 +413,7 @@ def tsne_visualization():
 
     tsne_df["Name"] = df["Name"]
 
-    # Create plot
+    # Create graph
     fig, ax = plt.subplots(
         figsize=(8, 5)
     )
@@ -490,7 +436,8 @@ def tsne_visualization():
                 tsne_df["Dimension 2"].iloc[i]
             ),
             xytext=(5, 5),
-            textcoords="offset points"
+            textcoords="offset points",
+            fontsize=9
         )
 
     ax.set_title(
@@ -512,63 +459,11 @@ def tsne_visualization():
 
     plt.tight_layout()
 
-    information = """
-## 🟣 t-SNE Analysis
-
-**Original Dimensions:** 4
-
-**Reduced Dimensions:** 2
-
-### What does t-SNE do?
-
-t-SNE is a non-linear dimensionality
-reduction technique.
-
-It tries to keep similar observations
-close together in the lower-dimensional
-space.
-
-Therefore, it is useful for identifying
-patterns and possible clusters among
-students.
-
-### Important
-
-The two t-SNE axes do not have a direct
-meaning such as "marks" or "average".
-
-They are mainly used for visualization.
-"""
-
-    return information, fig
+    return fig
 
 
 # ============================================================
-# PCA VS t-SNE
-# ============================================================
-
-comparison_text = """
-## ⚖️ PCA vs t-SNE
-
-| Feature | PCA | t-SNE |
-|---|---|---|
-| Type | Linear | Non-linear |
-| Main purpose | Reduce dimensions and preserve variance | Visualize local similarities |
-| Focus | Overall variation | Local neighborhoods |
-| Speed | Faster | Generally slower |
-| Best use | Reduction + visualization | Visualization |
-| Output | Principal Components | 2D/3D embedding |
-
-### Easy way to remember
-
-**PCA → Preserve variance**
-
-**t-SNE → Preserve neighborhoods**
-"""
-
-
-# ============================================================
-# GRADIO DASHBOARD
+# GRADIO INTERFACE
 # ============================================================
 
 with gr.Blocks(
@@ -584,149 +479,97 @@ with gr.Blocks(
         # 📚 Student Performance Analyzer
 
         ### Analyze student performance using Python,
-        ### Pandas, NumPy, PCA and t-SNE
+        Pandas, NumPy, Matplotlib, PCA and t-SNE.
         """
     )
 
+
     # --------------------------------------------------------
-    # KPI SECTION
+    # DATA TABLE
     # --------------------------------------------------------
 
     gr.Markdown(
-        "## 📊 Class Overview"
+        "## 📋 Student Performance Data"
+    )
+
+    student_table = gr.Dataframe(
+        value=df,
+        label="Student Performance",
+        interactive=False
+    )
+
+
+    # --------------------------------------------------------
+    # PERFORMANCE SUMMARY
+    # --------------------------------------------------------
+
+    gr.Markdown(
+        "## 📊 Performance Summary"
     )
 
     with gr.Row():
 
-        with gr.Column():
-            gr.Markdown(
-                f"""
-                <div class="kpi">
-
-                ### 👨‍🎓 Students
-
-                ## {len(df)}
-
-                </div>
-                """
-            )
-
-        with gr.Column():
-            gr.Markdown(
-                f"""
-                <div class="kpi">
-
-                ### 📈 Class Average
-
-                ## {class_average}
-
-                </div>
-                """
-            )
-
-        with gr.Column():
-            gr.Markdown(
-                f"""
-                <div class="kpi">
-
-                ### 🏆 Topper
-
-                ## {topper}
-
-                </div>
-                """
-            )
-
-        with gr.Column():
-            gr.Markdown(
-                f"""
-                <div class="kpi">
-
-                ### ✅ Pass Rate
-
-                ## {pass_rate}%
-
-                </div>
-                """
-            )
-
-    gr.Markdown("---")
-
-    # --------------------------------------------------------
-    # STUDENT ANALYSIS
-    # --------------------------------------------------------
-
-    gr.Markdown(
-        "## 👨‍🎓 Student Analysis"
-    )
-
-    with gr.Row():
-
-        student_dropdown = gr.Dropdown(
-            choices=df["Name"].tolist(),
-            value=df["Name"].iloc[0],
-            label="Select Student"
+        class_avg_box = gr.Textbox(
+            value=str(class_average),
+            label="Class Average"
         )
 
-        student_button = gr.Button(
-            "Analyze Student",
-            variant="primary"
+        topper_box = gr.Textbox(
+            value=topper,
+            label="Topper"
         )
 
-    student_info = gr.Markdown()
+        pass_rate_box = gr.Textbox(
+            value=f"{pass_rate}%",
+            label="Pass Rate"
+        )
 
-    student_plot = gr.Plot(
-        label="Student Performance"
-    )
-
-    student_button.click(
-        fn=student_analysis,
-        inputs=student_dropdown,
-        outputs=[
-            student_info,
-            student_plot
-        ]
-    )
-
-    gr.Markdown("---")
 
     # --------------------------------------------------------
-    # CLASS PERFORMANCE
+    # PERFORMANCE CHARTS
     # --------------------------------------------------------
 
     gr.Markdown(
-        "## 📊 Class Performance"
+        "---"
+    )
+
+    gr.Markdown(
+        "## 📈 Performance Charts"
     )
 
     with gr.Row():
+
+        performance_chart = gr.Plot(
+            value=student_performance(),
+            label="Student Performance"
+        )
 
         subject_chart = gr.Plot(
-            label="Subject Performance"
+            value=subject_average(),
+            label="Subject Average"
         )
 
+
+    with gr.Row():
+
         average_chart = gr.Plot(
+            value=student_average(),
             label="Student Average"
         )
 
-    gr.Markdown("---")
+        heatmap_chart = gr.Plot(
+            value=performance_heatmap(),
+            label="Performance Heatmap"
+        )
 
-    # --------------------------------------------------------
-    # HEATMAP
-    # --------------------------------------------------------
-
-    gr.Markdown(
-        "## 🔥 Performance Heatmap"
-    )
-
-    heatmap_plot = gr.Plot(
-        label="Performance Heatmap"
-    )
-
-    gr.Markdown("---")
 
     # --------------------------------------------------------
     # DIMENSIONALITY REDUCTION
     # --------------------------------------------------------
+
+    gr.Markdown(
+        "---"
+    )
 
     gr.Markdown(
         """
@@ -734,13 +577,11 @@ with gr.Blocks(
 
         ### PCA and t-SNE Visualization
 
-        The student dataset contains multiple
-        performance features.
-
-        PCA and t-SNE reduce these features into
-        two dimensions for visualization.
+        The student performance data is reduced
+        to two dimensions for visualization.
         """
     )
+
 
     # --------------------------------------------------------
     # PCA
@@ -755,8 +596,6 @@ with gr.Blocks(
         variant="primary"
     )
 
-    pca_info = gr.Markdown()
-
     pca_plot = gr.Plot(
         label="PCA 2D Visualization"
     )
@@ -764,17 +603,17 @@ with gr.Blocks(
     pca_button.click(
         fn=pca_visualization,
         inputs=None,
-        outputs=[
-            pca_info,
-            pca_plot
-        ]
+        outputs=pca_plot
     )
 
-    gr.Markdown("---")
 
     # --------------------------------------------------------
     # t-SNE
     # --------------------------------------------------------
+
+    gr.Markdown(
+        "---"
+    )
 
     gr.Markdown(
         "## 🟣 t-SNE Visualization"
@@ -785,8 +624,6 @@ with gr.Blocks(
         variant="primary"
     )
 
-    tsne_info = gr.Markdown()
-
     tsne_plot = gr.Plot(
         label="t-SNE 2D Visualization"
     )
@@ -794,62 +631,13 @@ with gr.Blocks(
     tsne_button.click(
         fn=tsne_visualization,
         inputs=None,
-        outputs=[
-            tsne_info,
-            tsne_plot
-        ]
-    )
-
-    gr.Markdown("---")
-
-    # --------------------------------------------------------
-    # COMPARISON
-    # --------------------------------------------------------
-
-    gr.Markdown(
-        comparison_text
-    )
-
-    gr.Markdown("---")
-
-    # --------------------------------------------------------
-    # COMPLETE DATASET
-    # --------------------------------------------------------
-
-    gr.Markdown(
-        "## 📋 Complete Student Dataset"
-    )
-
-    dataset_table = gr.Dataframe(
-        value=df,
-        interactive=False
-    )
-
-    # --------------------------------------------------------
-    # LOAD INITIAL CHARTS
-    # --------------------------------------------------------
-
-    demo.load(
-        fn=subject_analysis,
-        inputs=None,
-        outputs=subject_chart
-    )
-
-    demo.load(
-        fn=student_average_chart,
-        inputs=None,
-        outputs=average_chart
-    )
-
-    demo.load(
-        fn=performance_heatmap,
-        inputs=None,
-        outputs=heatmap_plot
+        outputs=tsne_plot
     )
 
 
 # ============================================================
 # RUN APPLICATION
 # ============================================================
+
 if __name__ == "__main__":
     demo.launch()
