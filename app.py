@@ -1,12 +1,14 @@
 import gradio as gr
 import pandas as pd
 import numpy as np
+
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-
 
 # ============================================================
 # STUDENT DATA
